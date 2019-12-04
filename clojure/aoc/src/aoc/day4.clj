@@ -22,21 +22,9 @@
   [input]
   (solve part1-filter input))
 
-(defn cnt-adj
-  [number]
-  (loop
-    [n number acc {}]
-    (if (empty? n)
-      acc
-      (recur
-        (rest n)
-        (if (= (first n) (second n))
-          (update acc (first n) (fnil inc 1))
-          acc)))))
-
 (defn has-adj?
   [l]
-  (some #{2} (vals (cnt-adj l))))
+  (some #{2} (vals (frequencies l))))
 
 (defn part2
   [input]
