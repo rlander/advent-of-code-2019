@@ -11,16 +11,17 @@
 (defn calc-points
   [input]
   (reduce
-    (fn [{:keys [x y points steps]} el]
-      (let [len     (read-string (subs el 1))
+    (fn [points el]
+      (let [len (read-string (subs el 1))
+            [[x y] steps] (apply max-key val points)
             [dx dy] (get directions (first el))
             points' (reduce-kv
-                      (fn [m idx _]
-                        (assoc m [(+ x (* idx dx)) (+ y (* idx dy))] (+ steps idx)))
+                      (fn [res idx item]
+                        (assoc res [(+ x (* idx dx)) (+ y (* idx dy))] (+ steps idx)))
                       {}
-                      (vec (range len)))]
-        {:x (+ x (* len dx)) :y (+ y (* len dy)) :points (conj points points') :steps (+ len steps)}))
-    {:x 0 :y 0 :points {} :steps 0}
+                      (vec (range (+ 1 len))))]
+        (conj points points')))
+    {[0,0] 0}
     input))
 
 (defn intersect
@@ -30,7 +31,7 @@
 (defn part1
   [input]
   (->> input
-       (map #(->> % calc-points :points))
+       (map calc-points)
        intersect
        (map #(+ (Math/abs (- (first %) 0)) (Math/abs (- (second %) 0))))
        sort
@@ -38,7 +39,7 @@
 
 (defn part2
   [input]
-  (let [[wirea wireb] (map #(->> % calc-points :points) input)]
+  (let [[wirea wireb] (map calc-points input)]
     (->> [wirea wireb]
          intersect
          (map #(+ (get wirea %) (get wireb %)))
